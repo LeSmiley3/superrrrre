@@ -12,7 +12,7 @@ interface ProductFormData {
 }
 
 export function ProductManagement() {
-  const { products, addProduct, updateProduct, deleteProduct } = useProducts();
+  const { products, loading, error, addProduct, updateProduct, deleteProduct } = useProducts();
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -33,13 +33,17 @@ export function ProductManagement() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (editingProduct) {
-      updateProduct(editingProduct.id, formData);
-      setEditingProduct(null);
+      updateProduct(editingProduct.id, formData).then(() => {
+        setEditingProduct(null);
+        setFormData({ barcode: '', name: '', price: 0, category: '', stock: 0 });
+        setShowForm(false);
+      });
     } else {
-      addProduct(formData);
+      addProduct(formData).then(() => {
+        setFormData({ barcode: '', name: '', price: 0, category: '', stock: 0 });
+        setShowForm(false);
+      });
     }
-    setFormData({ barcode: '', name: '', price: 0, category: '', stock: 0 });
-    setShowForm(false);
   };
 
   const handleEdit = (product: Product) => {
@@ -62,6 +66,12 @@ export function ProductManagement() {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
+      {error && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-800 text-sm">{error}</p>
+        </div>
+      )}
+      
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <Package className="h-6 w-6 text-blue-600" />
@@ -216,6 +226,7 @@ export function ProductManagement() {
                     <button
                       onClick={() => deleteProduct(product.id)}
                       className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
+                      disabled={loading}
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -227,7 +238,14 @@ export function ProductManagement() {
         </table>
       </div>
 
-      {filteredProducts.length === 0 && (
+      {loading && (
+        <div className="text-center py-8">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <p className="mt-2 text-gray-500">Chargement...</p>
+        </div>
+      )}
+
+      {!loading && filteredProducts.length === 0 && (
         <div className="text-center py-8">
           <Package className="h-12 w-12 text-gray-400 mx-auto mb-3" />
           <p className="text-gray-500">

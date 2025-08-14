@@ -1,0 +1,36 @@
+{
+  "appId": "com.superette.pos",
+  "productName": "Superette POS",
+  "directories": {
+    "output": "dist-electron"
+  },
+  "files": [
+    "dist/**/*",
+    "electron/**/*",
+    "node_modules/**/*"
+  ],
+  "extraResources": [
+    {
+      "from": "public",
+      "to": "public"
+    }
+  ],
+  "win": {
+    "target": "nsis",
+    "icon": "public/vite.svg"
+  },
+  "mac": {
+    "target": "dmg",
+    "icon": "public/vite.svg"
+  },
+  "linux": {
+    "target": "AppImage",
+    "icon": "public/vite.svg"
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true
+  }
+}

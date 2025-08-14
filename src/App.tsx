@@ -61,6 +61,24 @@ function AppContent() {
   const handleGenerateInvoice = () => {
     const invoiceNumber = `INV-${Date.now()}`;
     setCurrentInvoiceNumber(invoiceNumber);
+    
+    // Sauvegarder la facture dans la base de données si on est dans Electron
+    if (window.electronAPI) {
+      const subtotal = cartItems.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+      const tax = subtotal * 0.20;
+      const total = subtotal + tax;
+      
+      window.electronAPI.saveInvoice({
+        invoiceNumber,
+        items: cartItems,
+        subtotal,
+        tax,
+        total
+      }).catch(error => {
+        console.error('Erreur lors de la sauvegarde de la facture:', error);
+      });
+    }
+    
     setShowInvoice(true);
   };
 
